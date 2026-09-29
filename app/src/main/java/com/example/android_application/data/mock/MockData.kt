@@ -1,8 +1,9 @@
 package com.example.android_application.data.mock
 
 import com.example.android_application.data.model.GameScenario
+import com.example.android_application.data.model.GameStage
 
-object MockData {
+class MockData {
     val scenarios = listOf(
         GameScenario(
             id = 1,
@@ -27,6 +28,31 @@ object MockData {
             description = "Испытание для смельчаков после заката",
             maxScore = 200,
             estimatedMinutes = 120
+        )
+    )
+
+    val stages = listOf(
+        GameStage(
+            id = 1,
+            scenarioId = 1,
+            stageNumber = 1,
+            riddle = "Я стою в тени деревьев, где отдыхают люди. Меня легко найти, но сложно заметить.",
+            hints = listOf(
+                "Посмотрите на скамейки",
+                "Рядом с фонтаном",
+                "Ищите табличку с QR-кодом"
+            ),
+            transitionCondition = "Найдите QR-код",
+            qrCode = "QUEST_PARK_001"
+        ),
+        GameStage(
+            id = 2,
+            scenarioId = 1,
+            stageNumber = 2,
+            riddle = "Я — старый свидетель истории, но молчу уже сто лет.",
+            hints = listOf("Обратите внимание на памятники"),
+            transitionCondition = "Найдите QR-код",
+            qrCode = "QUEST_PARK_002"
         )
     )
 }

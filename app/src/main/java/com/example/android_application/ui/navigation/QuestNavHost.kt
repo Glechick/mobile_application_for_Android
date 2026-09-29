@@ -1,0 +1,79 @@
+package com.example.android_application.ui.navigation
+
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import com.example.android_application.ui.home.HomeScreen
+import com.example.android_application.ui.scanner.ScannerScreen
+import com.example.android_application.ui.stage.StageScreen
+
+object Routes {
+    const val HOME = "home"
+    const val STAGE = "stage/{stageId}"
+    const val SCANNER = "scanner/{stageId}"
+
+    fun stage(stageId: Int) = "stage/$stageId"
+    fun scanner(stageId: Int) = "scanner/$stageId"
+}
+
+@Composable
+fun QuestNavHost(navController: NavHostController) {
+    NavHost(
+        navController = navController,
+        startDestination = Routes.HOME,
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None }
+    ) {
+        composable(
+            route = Routes.HOME,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None }
+        ) {
+            HomeScreen(
+                onScenarioClick = { scenarioId ->
+                    navController.navigate(Routes.stage(scenarioId))
+                }
+            )
+        }
+
+        composable(
+            route = Routes.STAGE,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None }
+        ) { backStackEntry ->
+            val stageId = backStackEntry.arguments
+                ?.getString("stageId")
+                ?.toIntOrNull() ?: 1
+            StageScreen(
+                stageId = stageId,
+                onScanClick = {
+                    navController.navigate(Routes.scanner(stageId))
+                }
+            )
+        }
+
+        composable(
+            route = Routes.SCANNER,
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None }
+        ) { backStackEntry ->
+            val stageId = backStackEntry.arguments
+                ?.getString("stageId")
+                ?.toIntOrNull() ?: 1
+            ScannerScreen(
+                stageId = stageId,
+                onBack = { navController.popBackStack() }
+            )
+        }
+    }
+}
+
+@Composable
+fun ScannerScreen(stageId: Int, onBack: () -> Boolean) {
+    TODO("Not yet implemented")
+}

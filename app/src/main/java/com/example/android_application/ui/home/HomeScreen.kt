@@ -1,5 +1,6 @@
 package com.example.android_application.ui.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.android_application.data.model.GameScenario
 
@@ -35,7 +37,8 @@ import com.example.android_application.data.model.GameScenario
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = viewModel()
+    onScenarioClick: (Int) -> Unit = {},
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -74,10 +77,14 @@ fun HomeScreen(
                 }
 
                 items(uiState.scenarios, key = { it.id }) { scenario ->
-                    ScenarioCard(scenario = scenario)
+                    ScenarioCard(
+                        scenario = scenario,
+                        onClick = { onScenarioClick(scenario.id) }
+                    )
                 }
             }
         }
+
     }
 }
 @Composable
@@ -123,9 +130,12 @@ private fun StatItem(label: String, value: String) {
 }
 
 @Composable
-private fun ScenarioCard(scenario: GameScenario) {
+private fun ScenarioCard(
+    scenario: GameScenario,
+    onClick: () -> Unit
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable { onClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
