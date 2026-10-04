@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -25,7 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -44,11 +44,13 @@ import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
 import java.util.concurrent.Executors
 
+@androidx.annotation.OptIn(ExperimentalGetImage::class)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScannerScreen(
     stageId: Int,
     onBack: () -> Unit = {},
+    onStageCompleted: (nextStageId: Int?) -> Unit = {},
     viewModel: ScannerViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -104,7 +106,6 @@ fun ScannerScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // Превью камеры
             AndroidView(
                 modifier = Modifier
                     .weight(1f)
@@ -165,7 +166,6 @@ fun ScannerScreen(
                 }
             )
 
-            // Карточка результата
             uiState.scannedCode?.let { code ->
                 Card(
                     modifier = Modifier
@@ -198,7 +198,10 @@ fun ScannerScreen(
 
                         if (uiState.isSuccess) {
                             Button(
-                                onClick = onBack,
+                                onClick = {
+                                    val nextId = viewModel.getNextStageId()
+                                    onStageCompleted(nextId)
+                                },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Text("Продолжить")

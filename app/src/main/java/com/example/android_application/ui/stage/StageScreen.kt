@@ -34,22 +34,26 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StageScreen(
-    stageId: Int,
-    onScanClick: () -> Unit = {},
+    startId: Int,
+    onScanClick: (stageId: Int) -> Unit = {},
+    onScenarioFinished: () -> Unit = {},
     viewModel: StageViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(stageId) {
-        viewModel.loadStage(stageId)
+    LaunchedEffect(startId) {
+        viewModel.loadStage(startId)
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    val stageNumber = uiState.stage?.stageNumber
-                    Text(if (stageNumber != null) "Этап $stageNumber" else "Этап")
+                    if (uiState.stage != null && uiState.totalStages > 0) {
+                        Text("Этап ${uiState.stageNumber} из ${uiState.totalStages}")
+                    } else {
+                        Text("Этап")
+                    }
                 }
             )
         }
@@ -90,7 +94,6 @@ fun StageScreen(
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Загадка
                     SectionTitle("Загадка")
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -105,7 +108,6 @@ fun StageScreen(
                         )
                     }
 
-                    // Подсказки
                     SectionTitle("Подсказки")
                     stage.hints.forEachIndexed { index, hint ->
                         if (index in uiState.revealedHints) {
@@ -143,7 +145,6 @@ fun StageScreen(
                         }
                     }
 
-                    // Условие перехода
                     SectionTitle("Условие перехода")
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -160,12 +161,33 @@ fun StageScreen(
 
                     Spacer(Modifier.height(8.dp))
 
-                    // Кнопка сканирования (пока заглушка)
-                    Button(
-                        onClick = onScanClick,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Сканировать QR-код")
+                    if (uiState.isStageCompleted) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        ) {
+                            Text(
+                                text = "Этап пройден",
+                                modifier = Modifier.padding(16.dp),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        OutlinedButton(
+                            onClick = onScenarioFinished,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("На главный экран")
+                        }
+                    } else {
+                        Button(
+                            onClick = { onScanClick(stage.id) },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Сканировать QR-код")
+                        }
                     }
 
                     Spacer(Modifier.height(16.dp))

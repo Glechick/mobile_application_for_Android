@@ -3,6 +3,7 @@ package com.example.android_application.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android_application.data.model.GameScenario
+import com.example.android_application.data.progress.InMemoryProgress
 import com.example.android_application.data.repository.ScenarioRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,9 +31,20 @@ class HomeViewModel @Inject constructor(
         loadScenarios()
     }
 
-    private fun loadScenarios() {
+    fun loadScenarios() {
         viewModelScope.launch {
-            val scenarios = repository.getScenarios()
+            val scenarios = repository.getScenarios().map { scenario ->
+                val done = InMemoryProgress.isScenarioCompleted(scenario.id)
+                val stages = repository.getStagesOfScenario(scenario.id)
+                val completedStages = stages.count { InMemoryProgress.isStageCompleted(it.id) }
+                val allDone = stages.isNotEmpty() && completedStages == stages.size
+
+                scenario.copy(
+                    isCompleted = done || allDone,
+                    earnedScore = if (done || allDone) scenario.maxScore else 0,
+                    timeSpentMinutes = if (done || allDone) scenario.estimatedMinutes else 0
+                )
+            }
             _uiState.value = HomeUiState(
                 scenarios = scenarios,
                 totalScore = scenarios.sumOf { it.earnedScore },

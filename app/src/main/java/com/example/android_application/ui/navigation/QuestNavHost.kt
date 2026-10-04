@@ -36,6 +36,7 @@ fun QuestNavHost(navController: NavHostController) {
         ) {
             HomeScreen(
                 onScenarioClick = { scenarioId ->
+                    // передаём scenarioId — StageScreen сам найдёт первый этап
                     navController.navigate(Routes.stage(scenarioId))
                 }
             )
@@ -46,13 +47,18 @@ fun QuestNavHost(navController: NavHostController) {
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None }
         ) { backStackEntry ->
-            val stageId = backStackEntry.arguments
+            // здесь stageId — это либо scenarioId (с главного), либо id этапа (из сканера)
+            // различаем по договорённости: StageScreen сам решит, что делать
+            val id = backStackEntry.arguments
                 ?.getString("stageId")
                 ?.toIntOrNull() ?: 1
             StageScreen(
-                stageId = stageId,
-                onScanClick = {
+                startId = id,
+                onScanClick = { stageId ->
                     navController.navigate(Routes.scanner(stageId))
+                },
+                onScenarioFinished = {
+                    navController.popBackStack(Routes.HOME, inclusive = false)
                 }
             )
         }
@@ -67,13 +73,19 @@ fun QuestNavHost(navController: NavHostController) {
                 ?.toIntOrNull() ?: 1
             ScannerScreen(
                 stageId = stageId,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onStageCompleted = { nextStageId ->
+                    if (nextStageId != null) {
+                        // убираем текущий этап из стека и открываем следующий
+                        navController.navigate(Routes.stage(nextStageId)) {
+                            popUpTo(Routes.STAGE) { inclusive = true }
+                        }
+                    } else {
+                        // последний этап — назад на главный
+                        navController.popBackStack(Routes.HOME, inclusive = false)
+                    }
+                }
             )
         }
     }
-}
-
-@Composable
-fun ScannerScreen(stageId: Int, onBack: () -> Boolean) {
-    TODO("Not yet implemented")
 }

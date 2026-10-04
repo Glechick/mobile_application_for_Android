@@ -10,10 +10,7 @@ class MockData {
             title = "Тайна старого парка",
             description = "Найдите 5 контрольных меток в парке Горького",
             maxScore = 100,
-            estimatedMinutes = 45,
-            isCompleted = true,
-            earnedScore = 85,
-            timeSpentMinutes = 38
+            estimatedMinutes = 45
         ),
         GameScenario(
             id = 2,
@@ -32,6 +29,7 @@ class MockData {
     )
 
     val stages = listOf(
+        // === Сценарий 1 «Тайна старого парка» ===
         GameStage(
             id = 1,
             scenarioId = 1,
@@ -53,6 +51,64 @@ class MockData {
             hints = listOf("Обратите внимание на памятники"),
             transitionCondition = "Найдите QR-код",
             qrCode = "QUEST_PARK_002"
+        ),
+
+        // === Сценарий 2 «Квест по историческому центру» ===
+        GameStage(
+            id = 3,
+            scenarioId = 2,
+            stageNumber = 1,
+            riddle = "Я храню историю в своих стенах, но не могу рассказать её словами.",
+            hints = listOf(
+                "Здание на главной площади",
+                "Ищите QR-код у входа"
+            ),
+            transitionCondition = "Найдите QR-код у входа в музей",
+            qrCode = "QUEST_CENTER_001"
+        ),
+        GameStage(
+            id = 4,
+            scenarioId = 2,
+            stageNumber = 2,
+            riddle = "Я возвышаюсь над городом, меня видно с любого конца улицы.",
+            hints = listOf(
+                "Смотровая площадка",
+                "Ищите QR-код у подножия"
+            ),
+            transitionCondition = "Найдите QR-код у башни",
+            qrCode = "QUEST_CENTER_002"
+        ),
+        GameStage(
+            id = 5,
+            scenarioId = 2,
+            stageNumber = 3,
+            riddle = "Я помню голоса прошлого, но сегодня молчу.",
+            hints = listOf("Старинный особняк"),
+            transitionCondition = "Найдите QR-код у особняка",
+            qrCode = "QUEST_CENTER_003"
+        ),
+
+        // === Сценарий 3 «Ночной дозор» ===
+        GameStage(
+            id = 6,
+            scenarioId = 3,
+            stageNumber = 1,
+            riddle = "Я появляюсь, когда солнце уходит. Меня боятся, но и ждут.",
+            hints = listOf(
+                "Посмотрите на небо",
+                "Ищите QR-код у фонаря"
+            ),
+            transitionCondition = "Найдите QR-код у старого фонаря",
+            qrCode = "QUEST_NIGHT_001"
+        ),
+        GameStage(
+            id = 7,
+            scenarioId = 3,
+            stageNumber = 2,
+            riddle = "Я — тихий свидетель ночи, и только луна видит мои следы.",
+            hints = listOf("Загляните в переулки"),
+            transitionCondition = "Найдите QR-код в переулке",
+            qrCode = "QUEST_NIGHT_002"
         )
     )
 }
