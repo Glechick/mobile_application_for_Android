@@ -12,9 +12,11 @@ import com.example.android_application.ui.stage.StageScreen
 
 object Routes {
     const val HOME = "home"
+    const val SCENARIO = "scenario/{scenarioId}"
     const val STAGE = "stage/{stageId}"
     const val SCANNER = "scanner/{stageId}"
 
+    fun scenario(scenarioId: Int) = "scenario/$scenarioId"
     fun stage(stageId: Int) = "stage/$stageId"
     fun scanner(stageId: Int) = "scanner/$stageId"
 }
@@ -29,31 +31,21 @@ fun QuestNavHost(navController: NavHostController) {
         popEnterTransition = { EnterTransition.None },
         popExitTransition = { ExitTransition.None }
     ) {
-        composable(
-            route = Routes.HOME,
-            enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None }
-        ) {
+        composable(Routes.HOME) {
             HomeScreen(
                 onScenarioClick = { scenarioId ->
-                    // передаём scenarioId — StageScreen сам найдёт первый этап
-                    navController.navigate(Routes.stage(scenarioId))
+                    // с главного всегда идём как SCENARIO
+                    navController.navigate(Routes.scenario(scenarioId))
                 }
             )
         }
 
-        composable(
-            route = Routes.STAGE,
-            enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None }
-        ) { backStackEntry ->
-            // здесь stageId — это либо scenarioId (с главного), либо id этапа (из сканера)
-            // различаем по договорённости: StageScreen сам решит, что делать
-            val id = backStackEntry.arguments
-                ?.getString("stageId")
-                ?.toIntOrNull() ?: 1
+        // Переход с главного: знаем только scenarioId
+        composable(Routes.SCENARIO) { entry ->
+            val scenarioId = entry.arguments?.getString("scenarioId")?.toIntOrNull() ?: 1
             StageScreen(
-                startId = id,
+                scenarioId = scenarioId,
+                stageId = null,
                 onScanClick = { stageId ->
                     navController.navigate(Routes.scanner(stageId))
                 },
@@ -63,25 +55,33 @@ fun QuestNavHost(navController: NavHostController) {
             )
         }
 
-        composable(
-            route = Routes.SCANNER,
-            enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None }
-        ) { backStackEntry ->
-            val stageId = backStackEntry.arguments
-                ?.getString("stageId")
-                ?.toIntOrNull() ?: 1
+        // Переход из сканера: знаем конкретный stageId
+        composable(Routes.STAGE) { entry ->
+            val stageId = entry.arguments?.getString("stageId")?.toIntOrNull() ?: 1
+            StageScreen(
+                scenarioId = null,
+                stageId = stageId,
+                onScanClick = { id ->
+                    navController.navigate(Routes.scanner(id))
+                },
+                onScenarioFinished = {
+                    navController.popBackStack(Routes.HOME, inclusive = false)
+                }
+            )
+        }
+
+        composable(Routes.SCANNER) { entry ->
+            val stageId = entry.arguments?.getString("stageId")?.toIntOrNull() ?: 1
             ScannerScreen(
                 stageId = stageId,
                 onBack = { navController.popBackStack() },
                 onStageCompleted = { nextStageId ->
                     if (nextStageId != null) {
-                        // убираем текущий этап из стека и открываем следующий
+                        // убираем текущий этап и открываем следующий как STAGE
                         navController.navigate(Routes.stage(nextStageId)) {
-                            popUpTo(Routes.STAGE) { inclusive = true }
+                            popUpTo(Routes.SCANNER) { inclusive = true }
                         }
                     } else {
-                        // последний этап — назад на главный
                         navController.popBackStack(Routes.HOME, inclusive = false)
                     }
                 }

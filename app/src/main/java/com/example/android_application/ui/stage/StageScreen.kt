@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,15 +35,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StageScreen(
-    startId: Int,
+    scenarioId: Int? = null,
+    stageId: Int? = null,
     onScanClick: (stageId: Int) -> Unit = {},
     onScenarioFinished: () -> Unit = {},
     viewModel: StageViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(startId) {
-        viewModel.loadStage(startId)
+    LaunchedEffect(scenarioId, stageId) {
+        when {
+            stageId != null -> viewModel.loadStageById(stageId)
+            scenarioId != null -> viewModel.loadFirstStage(scenarioId)
+        }
     }
 
     Scaffold(
@@ -53,6 +58,11 @@ fun StageScreen(
                         Text("Этап ${uiState.stageNumber} из ${uiState.totalStages}")
                     } else {
                         Text("Этап")
+                    }
+                },
+                navigationIcon = {
+                    TextButton(onClick = onScenarioFinished) {
+                        Text("К списку")
                     }
                 }
             )
@@ -161,7 +171,7 @@ fun StageScreen(
 
                     Spacer(Modifier.height(8.dp))
 
-                    if (uiState.isStageCompleted) {
+                    if (uiState.isScenarioCompleted) {
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             colors = CardDefaults.cardColors(
@@ -169,7 +179,7 @@ fun StageScreen(
                             )
                         ) {
                             Text(
-                                text = "Этап пройден",
+                                text = "Сценарий пройден",
                                 modifier = Modifier.padding(16.dp),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
@@ -180,6 +190,20 @@ fun StageScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text("На главный экран")
+                        }
+                    } else if (uiState.isStageCompleted) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        ) {
+                            Text(
+                                text = "Этот этап пройден",
+                                modifier = Modifier.padding(16.dp),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     } else {
                         Button(

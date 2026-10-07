@@ -7,5 +7,7 @@ data class GameStage(
     val riddle: String,
     val hints: List<String>,
     val transitionCondition: String,
-    val qrCode: String
+    val qrCode: String = "",
+    val answerHash: String = "",
+    val score: Int = 20
 )

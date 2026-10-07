@@ -41,10 +41,8 @@ fun HomeScreen(
     onScenarioClick: (Int) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+
     val uiState by viewModel.uiState.collectAsState()
-    LaunchedEffect(Unit) {
-        viewModel.loadScenarios()
-    }
 
     Scaffold(
         topBar = {

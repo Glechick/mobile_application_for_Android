@@ -41,7 +41,8 @@ class MockData {
                 "Ищите табличку с QR-кодом"
             ),
             transitionCondition = "Найдите QR-код",
-            qrCode = "QUEST_PARK_001"
+            qrCode = "QUEST_PARK_001",
+            score = 50
         ),
         GameStage(
             id = 2,
@@ -50,7 +51,8 @@ class MockData {
             riddle = "Я — старый свидетель истории, но молчу уже сто лет.",
             hints = listOf("Обратите внимание на памятники"),
             transitionCondition = "Найдите QR-код",
-            qrCode = "QUEST_PARK_002"
+            qrCode = "QUEST_PARK_002",
+            score = 50
         ),
 
         // === Сценарий 2 «Квест по историческому центру» ===
@@ -64,7 +66,8 @@ class MockData {
                 "Ищите QR-код у входа"
             ),
             transitionCondition = "Найдите QR-код у входа в музей",
-            qrCode = "QUEST_CENTER_001"
+            qrCode = "QUEST_CENTER_001",
+            score = 50
         ),
         GameStage(
             id = 4,
@@ -76,7 +79,8 @@ class MockData {
                 "Ищите QR-код у подножия"
             ),
             transitionCondition = "Найдите QR-код у башни",
-            qrCode = "QUEST_CENTER_002"
+            qrCode = "QUEST_CENTER_002",
+            score = 50
         ),
         GameStage(
             id = 5,
@@ -85,7 +89,8 @@ class MockData {
             riddle = "Я помню голоса прошлого, но сегодня молчу.",
             hints = listOf("Старинный особняк"),
             transitionCondition = "Найдите QR-код у особняка",
-            qrCode = "QUEST_CENTER_003"
+            qrCode = "QUEST_CENTER_003",
+            score = 50
         ),
 
         // === Сценарий 3 «Ночной дозор» ===
@@ -99,7 +104,8 @@ class MockData {
                 "Ищите QR-код у фонаря"
             ),
             transitionCondition = "Найдите QR-код у старого фонаря",
-            qrCode = "QUEST_NIGHT_001"
+            qrCode = "QUEST_NIGHT_001",
+            score = 100
         ),
         GameStage(
             id = 7,
@@ -108,7 +114,8 @@ class MockData {
             riddle = "Я — тихий свидетель ночи, и только луна видит мои следы.",
             hints = listOf("Загляните в переулки"),
             transitionCondition = "Найдите QR-код в переулке",
-            qrCode = "QUEST_NIGHT_002"
+            qrCode = "QUEST_NIGHT_002",
+            score = 100
         )
     )
 }
