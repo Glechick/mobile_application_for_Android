@@ -46,6 +46,11 @@ kotlin {
 }
 
 dependencies {
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
+    implementation(libs.gson)
     implementation(libs.krdb.library.base)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)

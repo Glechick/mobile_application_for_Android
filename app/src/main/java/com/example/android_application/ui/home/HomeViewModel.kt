@@ -3,6 +3,7 @@ package com.example.android_application.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android_application.data.model.GameScenario
+import com.example.android_application.data.remote.QuestApi
 import com.example.android_application.data.repository.PlayerRepository
 import com.example.android_application.data.repository.ScenarioRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,14 +23,28 @@ data class HomeUiState(
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val scenarioRepository: ScenarioRepository,
-    private val playerRepository: PlayerRepository
+    private val playerRepository: PlayerRepository,
+    private val questApi: QuestApi // Внедряем API
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
+        testNetworkRequest() // Вызываем для логов
         observeProgress()
+    }
+
+    // ВРЕМЕННЫЙ МЕТОД: только для того, чтобы сделать сетевой запрос и получить лог
+    private fun testNetworkRequest() {
+        viewModelScope.launch {
+            try {
+                val result = questApi.getScenarios()
+                println("NETWORK SUCCESS: Получено ${result.size} элементов")
+            } catch (e: Exception) {
+                println("NETWORK ERROR: ${e.message}")
+            }
+        }
     }
 
     private fun observeProgress() {
