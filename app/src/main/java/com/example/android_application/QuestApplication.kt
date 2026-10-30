@@ -2,6 +2,7 @@ package com.example.android_application
 
 import android.app.Application
 import com.example.android_application.data.local.realm.StageSeeder
+import com.example.android_application.util.ModelInitializer
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +21,7 @@ class QuestApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         appScope.launch {
+            ModelInitializer.ensureModel(this@QuestApplication)
             stageSeeder.seedIfEmpty()
         }
     }

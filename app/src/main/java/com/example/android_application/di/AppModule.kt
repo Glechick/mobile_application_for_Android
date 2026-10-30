@@ -2,6 +2,8 @@ package com.example.android_application.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.android_application.data.local.realm.RealmStageRepository
+import com.example.android_application.data.local.room.HintDao
 import com.example.android_application.data.local.room.PlayerDao
 import com.example.android_application.data.local.room.QuestDatabase
 import com.example.android_application.data.mock.MockData
@@ -42,9 +44,13 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideHintDao(db: QuestDatabase): HintDao = db.hintDao()
+
+    @Provides
+    @Singleton
     fun provideScenarioRepository(
         mockData: MockData,
-        realmStageRepository: com.example.android_application.data.local.realm.RealmStageRepository
+        realmStageRepository: RealmStageRepository
     ): ScenarioRepository = ScenarioRepositoryImpl(mockData, realmStageRepository)
 
     @Provides

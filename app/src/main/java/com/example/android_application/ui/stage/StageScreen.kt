@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -31,6 +32,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.android_application.ui.hints.HintViewModel
+import com.example.android_application.ui.hints.LlmUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,9 +42,11 @@ fun StageScreen(
     stageId: Int? = null,
     onScanClick: (stageId: Int) -> Unit = {},
     onScenarioFinished: () -> Unit = {},
-    viewModel: StageViewModel = hiltViewModel()
+    viewModel: StageViewModel = hiltViewModel(),
+    hintViewModel: HintViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val hintState by hintViewModel.state.collectAsState()
 
     LaunchedEffect(scenarioId, stageId) {
         when {
@@ -71,9 +76,7 @@ fun StageScreen(
         when {
             uiState.isLoading -> {
                 Box(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(padding),
+                    Modifier.fillMaxSize().padding(padding),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
@@ -82,9 +85,7 @@ fun StageScreen(
 
             uiState.error != null -> {
                 Box(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(padding),
+                    Modifier.fillMaxSize().padding(padding),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -104,6 +105,7 @@ fun StageScreen(
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    // --- БЛОК ЗАГАДКИ ---
                     SectionTitle("Загадка")
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -118,7 +120,81 @@ fun StageScreen(
                         )
                     }
 
-                    SectionTitle("Подсказки")
+                    // --- КНОПКА И БЛОК ИИ-ПОДСКАЗОК ---
+                    Button(
+                        onClick = { hintViewModel.generateHints(stage.riddle) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.tertiary
+                        )
+                    ) {
+                        Text("✨ Сгенерировать ИИ-подсказки")
+                    }
+
+                    when (val state = hintState) {
+                        is LlmUiState.LoadingModel, is LlmUiState.Generating -> {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                )
+                            ) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    CircularProgressIndicator()
+                                    Spacer(Modifier.height(8.dp))
+                                    Text(
+                                        text = if (state is LlmUiState.LoadingModel) "Загрузка нейросети..." else "Генерация (может занять до минуты)...",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
+                        }
+                        is LlmUiState.Success -> {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                                )
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text(
+                                        text = "ИИ-Подсказки:",
+                                        fontWeight = FontWeight.Bold,
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                    Spacer(Modifier.height(8.dp))
+                                    state.hints.forEachIndexed { index, hint ->
+                                        Text(
+                                            text = "${index + 1}. $hint",
+                                            modifier = Modifier.padding(top = 4.dp),
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        is LlmUiState.Error -> {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.errorContainer
+                                )
+                            ) {
+                                Text(
+                                    text = "Ошибка ИИ: ${state.message}",
+                                    modifier = Modifier.padding(16.dp),
+                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                            }
+                        }
+                        else -> {}
+                    }
+
+                    // --- СТАРЫЕ ПОДСКАЗКИ ИЗ БД ---
+                    SectionTitle("Подсказки (по требованию)")
                     stage.hints.forEachIndexed { index, hint ->
                         if (index in uiState.revealedHints) {
                             Card(
@@ -128,9 +204,7 @@ fun StageScreen(
                                 )
                             ) {
                                 Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(12.dp),
+                                    modifier = Modifier.fillMaxWidth().padding(12.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -155,6 +229,7 @@ fun StageScreen(
                         }
                     }
 
+                    // --- УСЛОВИЕ ПЕРЕХОДА ---
                     SectionTitle("Условие перехода")
                     Card(
                         modifier = Modifier.fillMaxWidth(),
