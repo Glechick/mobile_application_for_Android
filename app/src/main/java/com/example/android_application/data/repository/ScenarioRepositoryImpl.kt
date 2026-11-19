@@ -38,5 +38,6 @@ private fun com.example.android_application.data.local.realm.GameStageEntity.toG
         hints = if (hints.isEmpty()) emptyList() else hints.split("||"),
         transitionCondition = transitionCondition,
         answerHash = answerHash,
-        score = score
+        score = score,
+        voiceAnswer = voiceAnswer
     )

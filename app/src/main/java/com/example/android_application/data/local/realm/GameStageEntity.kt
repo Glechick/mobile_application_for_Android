@@ -13,4 +13,5 @@ open class GameStageEntity : RealmObject {
     var transitionCondition: String = ""
     var answerHash: String = ""
     var score: Int = 0
+    var voiceAnswer: String = ""
 }

@@ -34,38 +34,45 @@ fun QuestNavHost(navController: NavHostController) {
         composable(Routes.HOME) {
             HomeScreen(
                 onScenarioClick = { scenarioId ->
-                    // с главного всегда идём как SCENARIO
                     navController.navigate(Routes.scenario(scenarioId))
                 }
             )
         }
 
-        // Переход с главного: знаем только scenarioId
         composable(Routes.SCENARIO) { entry ->
             val scenarioId = entry.arguments?.getString("scenarioId")?.toIntOrNull() ?: 1
             StageScreen(
                 scenarioId = scenarioId,
                 stageId = null,
-                onScanClick = { stageId ->
-                    navController.navigate(Routes.scanner(stageId))
-                },
-                onScenarioFinished = {
-                    navController.popBackStack(Routes.HOME, inclusive = false)
+                onScanClick = { id -> navController.navigate(Routes.scanner(id)) },
+                onScenarioFinished = { navController.popBackStack(Routes.HOME, inclusive = false) },
+                onStageCompleted = { nextStageId ->
+                    if (nextStageId != null) {
+                        navController.navigate(Routes.stage(nextStageId)) {
+                            popUpTo(Routes.SCENARIO) { inclusive = true }
+                        }
+                    } else {
+                        navController.popBackStack(Routes.HOME, inclusive = false)
+                    }
                 }
             )
         }
 
-        // Переход из сканера: знаем конкретный stageId
         composable(Routes.STAGE) { entry ->
             val stageId = entry.arguments?.getString("stageId")?.toIntOrNull() ?: 1
             StageScreen(
                 scenarioId = null,
                 stageId = stageId,
-                onScanClick = { id ->
-                    navController.navigate(Routes.scanner(id))
-                },
-                onScenarioFinished = {
-                    navController.popBackStack(Routes.HOME, inclusive = false)
+                onScanClick = { id -> navController.navigate(Routes.scanner(id)) },
+                onScenarioFinished = { navController.popBackStack(Routes.HOME, inclusive = false) },
+                onStageCompleted = { nextStageId ->
+                    if (nextStageId != null) {
+                        navController.navigate(Routes.stage(nextStageId)) {
+                            popUpTo(Routes.STAGE) { inclusive = true }
+                        }
+                    } else {
+                        navController.popBackStack(Routes.HOME, inclusive = false)
+                    }
                 }
             )
         }
@@ -77,7 +84,6 @@ fun QuestNavHost(navController: NavHostController) {
                 onBack = { navController.popBackStack() },
                 onStageCompleted = { nextStageId ->
                     if (nextStageId != null) {
-                        // убираем текущий этап и открываем следующий как STAGE
                         navController.navigate(Routes.stage(nextStageId)) {
                             popUpTo(Routes.SCANNER) { inclusive = true }
                         }

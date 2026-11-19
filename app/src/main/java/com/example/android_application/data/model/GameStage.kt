@@ -9,5 +9,6 @@ data class GameStage(
     val transitionCondition: String,
     val qrCode: String = "",
     val answerHash: String = "",
-    val score: Int = 20
+    val score: Int = 20,
+    val voiceAnswer: String = ""
 )

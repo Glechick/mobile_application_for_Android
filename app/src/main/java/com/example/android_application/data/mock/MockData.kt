@@ -42,7 +42,8 @@ class MockData {
             ),
             transitionCondition = "Найдите QR-код",
             qrCode = "QUEST_PARK_001",
-            score = 50
+            score = 50,
+            voiceAnswer = "скамейка"
         ),
         GameStage(
             id = 2,
@@ -52,7 +53,8 @@ class MockData {
             hints = listOf("Обратите внимание на памятники"),
             transitionCondition = "Найдите QR-код",
             qrCode = "QUEST_PARK_002",
-            score = 50
+            score = 50,
+            voiceAnswer = "памятник"
         ),
 
         // === Сценарий 2 «Квест по историческому центру» ===
@@ -67,7 +69,8 @@ class MockData {
             ),
             transitionCondition = "Найдите QR-код у входа в музей",
             qrCode = "QUEST_CENTER_001",
-            score = 50
+            score = 50,
+            voiceAnswer = "музей"
         ),
         GameStage(
             id = 4,
@@ -80,7 +83,8 @@ class MockData {
             ),
             transitionCondition = "Найдите QR-код у башни",
             qrCode = "QUEST_CENTER_002",
-            score = 50
+            score = 50,
+            voiceAnswer = "башня"
         ),
         GameStage(
             id = 5,
@@ -90,7 +94,8 @@ class MockData {
             hints = listOf("Старинный особняк"),
             transitionCondition = "Найдите QR-код у особняка",
             qrCode = "QUEST_CENTER_003",
-            score = 50
+            score = 50,
+            voiceAnswer = "особняк"
         ),
 
         // === Сценарий 3 «Ночной дозор» ===
@@ -105,7 +110,8 @@ class MockData {
             ),
             transitionCondition = "Найдите QR-код у старого фонаря",
             qrCode = "QUEST_NIGHT_001",
-            score = 100
+            score = 100,
+            voiceAnswer = "фонарь"
         ),
         GameStage(
             id = 7,
@@ -115,7 +121,8 @@ class MockData {
             hints = listOf("Загляните в переулки"),
             transitionCondition = "Найдите QR-код в переулке",
             qrCode = "QUEST_NIGHT_002",
-            score = 100
+            score = 100,
+            voiceAnswer = "переулок"
         )
     )
 }

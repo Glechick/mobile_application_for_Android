@@ -22,6 +22,7 @@ class StageSeeder @Inject constructor(
                 transitionCondition = stage.transitionCondition
                 answerHash = HashUtils.sha256(stage.qrCode)
                 score = stage.score
+                voiceAnswer = stage.voiceAnswer
             }
         }
         realmStageRepository.insertAll(entities)
